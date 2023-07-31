@@ -1,0 +1,72 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.*;
+public class WordCounter {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        String text = "";
+        // Step 1: Prompt the user to enter a text or provide a file
+        System.out.println("Enter '1' to provide text input, or '2' to provide a file path:");
+        int choice = scanner.nextInt();
+        scanner.nextLine(); // Consume the newline character after reading the integer input
+        switch (choice) {
+            case 1:
+                System.out.println("Enter the text:");
+                text = scanner.nextLine();
+                break;
+            case 2:
+                System.out.println("Enter the file path:");
+                String filePath = scanner.nextLine();
+                try {
+                    text = readFromFile(filePath);
+                } catch (IOException e) {
+                    System.out.println("Error reading file. Please check the file path and try again.");
+                    System.exit(1);
+                }
+                break;
+            default:
+                System.out.println("Invalid choice. Exiting the program.");
+                System.exit(1);
+        }
+        // Step 3: Split the string into an array of words using space or punctuation as delimiters.
+        String[] words = text.split("\\s+|\\p{Punct}");
+        // Step 4: Initialize a counter variable to keep track of the number of words.
+        int wordCount = 0;
+        // Step 7:  ignoring common words or stop words.
+        Set<String> stopWords = new HashSet<>(Arrays.asList("a","an","the","and","or","is","are","in","on","to","for","of","with"));
+        // Step 8: Providing statistics like the number of unique words or the frequency of each word.
+        Map<String,Integer> wordFrequency = new HashMap<>();
+        // Step 5: Iterate through the array of words and increment the counter for each word encountered.
+        for (String word : words) {
+            if (!word.isEmpty()) {
+                // Ignore empty strings (e.g., multiple spaces in the input)
+                word = word.toLowerCase(); // Convert to lowercase to count words case-insensitively
+                wordCount++;
+                // Update the word frequency map 
+                if (!stopWords.contains(word)) {
+                    wordFrequency.put(word,wordFrequency.getOrDefault(word,0) + 1);
+                }
+            }
+        }
+        // Step 6: Display the total count of words to the user.
+        System.out.println("Total number of words:" + wordCount);
+        // Step 8: Display the number of unique words and their frequencies.
+        System.out.println("Number of unique words:" + wordFrequency.size());
+        System.out.println("Word frequencies:");
+        for (Map.Entry<String,Integer> entry : wordFrequency.entrySet()) {
+            System.out.println(entry.getKey() + ":" + entry.getValue());
+        }
+    }
+    // Step 2: Read the input text from a file and store it in a string.
+    private static String readFromFile(String filePath) throws IOException {
+        StringBuilder content = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = br.readLine())!=null) {
+                content.append(line).append("\n");
+            }
+        }
+        return content.toString();
+    }
+}
